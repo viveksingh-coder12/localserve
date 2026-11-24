@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalServe - Community Service Directory</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Smooth transitions & custom scrollbar */
+        * {
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-cyan-500 flex items-center justify-center text-white text-xl font-bold shadow-md">
+                    <i class="fa-solid fa-handshake"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 leading-none">Local<span class="text-brand-600">Serve</span></h1>
+                    <p class="text-xs text-slate-500 font-medium">Verified Community Experts</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="openModal('registerModal')" class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md flex items-center gap-2 active:scale-95 transition-all">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span class="hidden sm:inline">Join as a</span> Professional
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
+        
+        <!-- HERO & SEARCH SECTION -->
+        <div class="bg-gradient-to-r from-slate-900 via-brand-800 to-slate-900 text-white rounded-3xl p-6 sm:p-10 mb-8 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
+                <i class="fa-solid fa-city text-9xl"></i>
+            </div>
+            <div class="max-w-2xl relative z-10">
+                <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3">
+                    Find reliable local professionals near you
+                </h2>
+                <p class="text-slate-200 text-sm sm:text-base mb-6 font-light">
+                    Connect instantly with verified Electricians, Plumbers, Cooks, Mechanics & more in your neighborhood.
+                </p>
+            </div>
+
+            <!-- SEARCH & FILTERS CONTAINER -->
+            <div class="bg-white text-slate-800 p-4 sm:p-5 rounded-2xl shadow-lg border border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 relative z-10">
+                
+                <!-- Category Filter -->
+                <div class="flex flex-col">
+                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Service Type</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-screwdriver-wrench absolute left-3 top-3 text-slate-400 text-sm"></i>
+                        <select id="filterCategory" onchange="applyFilters()" class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <option value="All">All Services</option>
+                            <option value="Electrician">Electrician</option>
+                            <option value="Plumber">Plumber</option>
+                            <option value="Cook">Cook / Chef</option>
+                            <option value="Carpenter">Carpenter</option>
+                            <option value="Mechanic">Mechanic</option>
+                            <option value="Shopkeeper">Shopkeeper</option>
+                            <option value="Cleaner">Home Cleaner</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Location / Pincode Search -->
+                <div class="flex flex-col">
+                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Location or Pincode</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-location-dot absolute left-3 top-3 text-slate-400 text-sm"></i>
+                        <input type="text" id="filterLocation" oninput="applyFilters()" placeholder="e.g. Sector 62 or 201301" class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Rating Filter -->
+                <div class="flex flex-col">
+                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Minimum Rating</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-star absolute left-3 top-3 text-amber-400 text-sm"></i>
+                        <select id="filterRating" onchange="applyFilters()" class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <option value="0">Any Rating</option>
+                            <option value="4.5">4.5+ Stars</option>
+                            <option value="4.0">4.0+ Stars</option>
+                            <option value="3.0">3.0+ Stars</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Reset Button -->
+                <div class="flex flex-col justify-end">
+                    <button onclick="resetFilters()" class="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left text-xs"></i> Reset Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS & CATEGORY QUICK PILLS -->
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div class="flex flex-wrap items-center gap-2" id="categoryPills">
+                <!-- Dynamic Pills generated via JS -->
+            </div>
+            <div class="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full" id="resultCount">
+                Showing 0 Providers
+            </div>
+        </div>
+
+        <!-- SERVICE PROVIDER CARDS GRID -->
+        <div id="providersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cards rendered dynamically -->
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div id="emptyState" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400 text-2xl">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">No Providers Found</h3>
+            <p class="text-slate-500 text-sm max-w-md mx-auto mb-6">We couldn't find any service provider matching your current filters. Try resetting search criteria or register a new provider.</p>
+            <button onclick="resetFilters()" class="px-5 py-2.5 bg-brand-600 text-white font-medium text-sm rounded-xl hover:bg-brand-700">Clear Search Filters</button>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-xs text-slate-500">© 2026 LocalServe Directory. Empowering local communities & independent workers.</p>
+            <div class="flex items-center gap-4 text-xs text-slate-400">
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-emerald-500"></i> Verified Listings</span>
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-bolt text-amber-500"></i> Instant Direct Contact</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: REGISTER NEW PROVIDER -->
+    <div id="registerModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('registerModal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900">Register Service Profile</h3>
+                    <p class="text-xs text-slate-500">List your services for local customers in your area</p>
+                </div>
+            </div>
+
+            <form id="registerForm" onsubmit="handleRegistration(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Full Name *</label>
+                    <input type="text" id="regName" required placeholder="e.g. Rajesh Kumar" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Service Category *</label>
+                        <select id="regCategory" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <option value="">Select Trade</option>
+                            <option value="Electrician">Electrician</option>
+                            <option value="Plumber">Plumber</option>
+                            <option value="Cook">Cook / Chef</option>
+                            <option value="Carpenter">Carpenter</option>
+                            <option value="Mechanic">Mechanic</option>
+                            <option value="Shopkeeper">Shopkeeper</option>
+                            <option value="Cleaner">Home Cleaner</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Experience (Years) *</label>
+                        <input type="number" min="0" max="50" id="regExp" required placeholder="e.g. 5" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Phone Number (10 digits) *</label>
+                        <input type="tel" pattern="[0-9]{10}" id="regPhone" required placeholder="9876543210" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Base Fee / Hourly Rate (₹)</label>
+                        <input type="number" id="regRate" placeholder="e.g. 300" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Pincode *</label>
+                        <input type="text" id="regPincode" required placeholder="e.g. 201301" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Area / Locality Name *</label>
+                        <input type="text" id="regArea" required placeholder="e.g. Sector 62, Noida" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Short Description / Specialization</label>
+                    <textarea id="regBio" rows="2" placeholder="e.g. Specialist in house wiring, AC repairs, and inverter setup." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeModal('registerModal')" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl">Cancel</button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-xl shadow-md">Register Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ADD REVIEW & RATING -->
+    <div id="reviewModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeModal('reviewModal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="mb-4">
+                <h3 class="text-xl font-bold text-slate-900" id="reviewModalTitle">Write a Review</h3>
+                <p class="text-xs text-slate-500">Share your experience with this service provider</p>
+            </div>
+
+            <form id="reviewForm" onsubmit="handleReviewSubmit(event)" class="space-y-4">
+                <input type="hidden" id="reviewProviderId">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Rating</label>
+                    <div class="flex gap-2 text-2xl text-slate-300 cursor-pointer" id="starRatingContainer">
+                        <i class="fa-solid fa-star transition-colors" data-star="1" onclick="setRating(1)"></i>
+                        <i class="fa-solid fa-star transition-colors" data-star="2" onclick="setRating(2)"></i>
+                        <i class="fa-solid fa-star transition-colors" data-star="3" onclick="setRating(3)"></i>
+                        <i class="fa-solid fa-star transition-colors" data-star="4" onclick="setRating(4)"></i>
+                        <i class="fa-solid fa-star transition-colors" data-star="5" onclick="setRating(5)"></i>
+                    </div>
+                    <input type="hidden" id="reviewRatingVal" value="5">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Your Name</label>
+                    <input type="text" id="reviewerName" required placeholder="e.g. Amit Sharma" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Comment / Feedback</label>
+                    <textarea id="reviewerComment" required rows="3" placeholder="Punctual, friendly and solved the issue quickly." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeModal('reviewModal')" class="w-1/2 py-2.5 bg-slate-100 text-slate-700 text-sm font-semibold rounded-xl">Cancel</button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl shadow-md">Post Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg" id="toastIcon"></i>
+        <span class="text-sm font-medium" id="toastMsg">Notification message</span>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Initial Mock Database
+        const DEFAULT_PROVIDERS = [
+            {
+                id: "prov-1",
+                name: "Ramesh Sharma",
+                category: "Electrician",
+                phone: "9818012345",
+                pincode: "201301",
+                area: "Sector 62, Noida",
+                exp: 8,
+                rate: 350,
+                bio: "Expert in home wiring, MCB tripping issues, fan fittings, and heavy appliance installations.",
+                isAvailable: true,
+                rating: 4.8,
+                reviewCount: 24,
+                reviews: [
+                    { name: "Suresh P.", rating: 5, comment: "Fixed my main switchboard in 20 minutes!" }
+                ]
+            },
+            {
+                id: "prov-2",
+                name: "Sunil Verma",
+                category: "Plumber",
+                phone: "9871122334",
+                pincode: "201301",
+                area: "Indirapuram, Ghaziabad",
+                exp: 10,
+                rate: 400,
+                bio: "Specialize in pipe leakage, RO water purifier fitting, and bathroom sanitary hardware installation.",
+                isAvailable: true,
+                rating: 4.6,
+                reviewCount: 18,
+                reviews: [
+                    { name: "Deepak M.", rating: 4, comment: "Punctual and charges fair rates." }
+                ]
+            },
+            {
+                id: "prov-3",
+                name: "Sunita Devi",
+                category: "Cook",
+                phone: "9910099887",
+                pincode: "110092",
+                area: "Mayur Vihar, Delhi",
+                exp: 6,
+                rate: 500,
+                bio: "Hygienic and authentic North Indian, South Indian, and healthy daily meal preparation.",
+                isAvailable: false,
+                rating: 4.9,
+                reviewCount: 32,
+                reviews: [
+                    { name: "Pooja K.", rating: 5, comment: "Delicious homemade food!" }
+                ]
+            },
+            {
+                id: "prov-4",
+                name: "Mohd. Arif",
+                category: "Carpenter",
+                phone: "9899114455",
+                pincode: "201301",
+                area: "Sector 18, Noida",
+                exp: 12,
+                rate: 600,
+                bio: "Modular kitchen repair, custom furniture, door lock replacement, and bed assembling.",
+                isAvailable: true,
+                rating: 4.7,
+                reviewCount: 15,
+                reviews: []
+            },
+            {
+                id: "prov-5",
+                name: "Vikram Singh",
+                category: "Mechanic",
+                phone: "9711005566",
+                pincode: "110092",
+                area: "Laxmi Nagar, Delhi",
+                exp: 7,
+                rate: 300,
+                bio: "Two-wheeler and four-wheeler doorstep breakdown assistance & oil service.",
+                isAvailable: true,
+                rating: 4.4,
+                reviewCount: 9,
+                reviews: []
+            }
+        ];
+
+        let providers = [];
+        let selectedCategoryFilter = "All";
+
+        // Category Icon Mapping
+        const CATEGORY_ICONS = {
+            "Electrician": "fa-bolt text-amber-500 bg-amber-50",
+            "Plumber": "fa-faucet text-blue-500 bg-blue-50",
+            "Cook": "fa-utensils text-rose-500 bg-rose-50",
+            "Carpenter": "fa-hammer text-orange-500 bg-orange-50",
+            "Mechanic": "fa-wrench text-slate-600 bg-slate-100",
+            "Shopkeeper": "fa-store text-emerald-500 bg-emerald-50",
+            "Cleaner": "fa-broom text-cyan-500 bg-cyan-50"
+        };
+
+        // Initialize App
+        window.onload = function() {
+            loadData();
+            renderCategoryPills();
+            applyFilters();
+        };
+
+        // Load data from LocalStorage or Fallback
+        function loadData() {
+            const stored = localStorage.getItem("localServe_providers");
+            if (stored) {
+                try {
+                    providers = JSON.parse(stored);
+                } catch (e) {
+                    providers = DEFAULT_PROVIDERS;
+                }
+            } else {
+                providers = DEFAULT_PROVIDERS;
+                saveData();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem("localServe_providers", JSON.stringify(providers));
+        }
+
+        // Render Category Filter Pills
+        function renderCategoryPills() {
+            const container = document.getElementById("categoryPills");
+            const categories = ["All", "Electrician", "Plumber", "Cook", "Carpenter", "Mechanic", "Shopkeeper", "Cleaner"];
+            
+            container.innerHTML = categories.map(cat => {
+                const isActive = selectedCategoryFilter === cat;
+                return `
+                    <button onclick="selectCategoryPill('${cat}')" class="px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                        isActive 
+                        ? 'bg-brand-600 text-white shadow-sm' 
+                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                    }">
+                        ${cat}
+                    </button>
+                `;
+            }).join("");
+        }
+
+        function selectCategoryPill(cat) {
+            selectedCategoryFilter = cat;
+            document.getElementById("filterCategory").value = cat;
+            renderCategoryPills();
+            applyFilters();
+        }
+
+        // Filter and Render Provider Cards
+        function applyFilters() {
+            const category = document.getElementById("filterCategory").value;
+            selectedCategoryFilter = category;
+            renderCategoryPills();
+
+            const locationQuery = document.getElementById("filterLocation").value.toLowerCase().trim();
+            const minRating = parseFloat(document.getElementById("filterRating").value) || 0;
+
+            const filtered = providers.filter(p => {
+                const matchCategory = (category === "All" || p.category === category);
+                const matchLocation = !locationQuery || 
+                    p.area.toLowerCase().includes(locationQuery) || 
+                    p.pincode.includes(locationQuery);
+                const matchRating = (p.rating >= minRating);
+                return matchCategory && matchLocation && matchRating;
+            });
+
+            renderProviders(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById("filterCategory").value = "All";
+            document.getElementById("filterLocation").value = "";
+            document.getElementById("filterRating").value = "0";
+            selectedCategoryFilter = "All";
+            renderCategoryPills();
+            applyFilters();
+        }
+
+        function renderProviders(list) {
+            const grid = document.getElementById("providersGrid");
+            const emptyState = document.getElementById("emptyState");
+            const countElem = document.getElementById("resultCount");
+
+            countElem.innerText = `Showing ${list.length} Provider${list.length === 1 ? '' : 's'}`;
+
+            if (list.length === 0) {
+                grid.innerHTML = "";
+                emptyState.classList.remove("hidden");
+                return;
+            }
+
+            emptyState.classList.add("hidden");
+
+            grid.innerHTML = list.map(p => {
+                const iconClass = CATEGORY_ICONS[p.category] || "fa-user text-brand-500 bg-brand-50";
+                
+                return `
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden relative group">
+                    
+                    <!-- Top Info Card Header -->
+                    <div class="p-5">
+                        <div class="flex items-start justify-between gap-3 mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl ${iconClass} flex items-center justify-center text-xl font-bold shadow-inner shrink-0">
+                                    <i class="fa-solid ${iconClass.split(" ")[0]}"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-900 text-base group-hover:text-brand-600 transition-colors">${escapeHtml(p.name)}</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 mt-0.5">
+                                        ${p.category}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Availability Badge -->
+                            <button onclick="toggleAvailability('${p.id}')" title="Click to toggle status" class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors ${
+                                p.isAvailable 
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                                : 'bg-slate-100 text-slate-500 border border-slate-200'
+                            }">
+                                <span class="w-2 h-2 rounded-full ${p.isAvailable ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}"></span>
+                                ${p.isAvailable ? 'Available' : 'Busy'}
+                            </button>
+                        </div>
+
+                        <!-- Rating & Exp Details -->
+                        <div class="flex items-center gap-4 text-xs text-slate-600 my-3 py-2 border-y border-slate-100">
+                            <div class="flex items-center gap-1">
+                                <i class="fa-solid fa-star text-amber-400"></i>
+                                <span class="font-bold text-slate-800">${p.rating.toFixed(1)}</span>
+                                <span class="text-slate-400">(${p.reviewCount})</span>
+                            </div>
+                            <div class="h-3 w-px bg-slate-200"></div>
+                            <div><span class="font-semibold text-slate-800">${p.exp} yrs</span> exp</div>
+                            <div class="h-3 w-px bg-slate-200"></div>
+                            <div>
+                                ${p.rate ? `<span class="font-semibold text-slate-800">₹${p.rate}</span> callout` : 'Rate on request'}
+                            </div>
+                        </div>
+
+                        <!-- Location & Bio -->
+                        <div class="space-y-1.5 text-xs text-slate-600">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-location-dot text-slate-400"></i>
+                                <span class="truncate">${escapeHtml(p.area)} (${p.pincode})</span>
+                            </div>
+                            <p class="text-slate-500 text-xs line-clamp-2 mt-2 leading-relaxed italic">
+                                "${escapeHtml(p.bio || 'Available for local community service.')}"
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Footer Call / WhatsApp Actions -->
+                    <div class="bg-slate-50 p-4 border-t border-slate-100 flex items-center gap-2">
+                        <a href="tel:${p.phone}" class="flex-1 py-2 px-3 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-phone text-emerald-600"></i> Call Now
+                        </a>
+                        <a href="https://wa.me/91${p.phone}?text=${encodeURIComponent('Hi ' + p.name + ', I found your contact on LocalServe directory for ' + p.category + ' service.')}" target="_blank" class="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                        </a>
+                        <button onclick="openReviewModal('${p.id}', '${escapeHtml(p.name)}')" title="Rate Provider" class="py-2 px-3 bg-white hover:bg-amber-50 text-amber-600 border border-slate-200 rounded-xl text-xs font-semibold">
+                            <i class="fa-regular fa-star"></i>
+                        </button>
+                    </div>
+
+                </div>
+                `;
+            }).join('');
+        }
+
+        // Handle Registration
+        function handleRegistration(e) {
+            e.preventDefault();
+
+            const name = document.getElementById("regName").value.trim();
+            const category = document.getElementById("regCategory").value;
+            const exp = parseInt(document.getElementById("regExp").value) || 0;
+            const phone = document.getElementById("regPhone").value.trim();
+            const rate = document.getElementById("regRate").value ? parseInt(document.getElementById("regRate").value) : null;
+            const pincode = document.getElementById("regPincode").value.trim();
+            const area = document.getElementById("regArea").value.trim();
+            const bio = document.getElementById("regBio").value.trim();
+
+            const newProvider = {
+                id: "prov-" + Date.now(),
+                name,
+                category,
+                phone,
+                pincode,
+                area,
+                exp,
+                rate,
+                bio,
+                isAvailable: true,
+                rating: 5.0,
+                reviewCount: 1,
+                reviews: [{ name: "System", rating: 5, comment: "Newly registered provider!" }]
+            };
+
+            providers.unshift(newProvider);
+            saveData();
+            applyFilters();
+
+            closeModal('registerModal');
+            document.getElementById("registerForm").reset();
+            showToast("Registration successful! You are now live.");
+        }
+
+        // Toggle Availability
+        function toggleAvailability(id) {
+            const index = providers.findIndex(p => p.id === id);
+            if (index !== -1) {
+                providers[index].isAvailable = !providers[index].isAvailable;
+                saveData();
+                applyFilters();
+                showToast(`Status updated to ${providers[index].isAvailable ? 'Available' : 'Busy'}`);
+            }
+        }
+
+        // Rating Modal Logic
+        function openReviewModal(id, name) {
+            document.getElementById("reviewProviderId").value = id;
+            document.getElementById("reviewModalTitle").innerText = `Rate ${name}`;
+            setRating(5);
+            openModal('reviewModal');
+        }
+
+        function setRating(val) {
+            document.getElementById("reviewRatingVal").value = val;
+            const stars = document.querySelectorAll("#starRatingContainer i");
+            stars.forEach((star, idx) => {
+                if (idx < val) {
+                    star.classList.remove("text-slate-300");
+                    star.classList.add("text-amber-400");
+                } else {
+                    star.classList.remove("text-amber-400");
+                    star.classList.add("text-slate-300");
+                }
+            });
+        }
+
+        function handleReviewSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById("reviewProviderId").value;
+            const reviewerName = document.getElementById("reviewerName").value.trim();
+            const ratingVal = parseFloat(document.getElementById("reviewRatingVal").value);
+            const comment = document.getElementById("reviewerComment").value.trim();
+
+            const index = providers.findIndex(p => p.id === id);
+            if (index !== -1) {
+                const prov = providers[index];
+                const totalRatingSum = (prov.rating * prov.reviewCount) + ratingVal;
+                prov.reviewCount += 1;
+                prov.rating = totalRatingSum / prov.reviewCount;
+                
+                if(!prov.reviews) prov.reviews = [];
+                prov.reviews.push({ name: reviewerName, rating: ratingVal, comment });
+
+                saveData();
+                applyFilters();
+                closeModal('reviewModal');
+                document.getElementById("reviewForm").reset();
+                showToast("Thank you! Your review has been recorded.");
+            }
+        }
+
+        // Modal Helpers
+        function openModal(id) {
+            document.getElementById(id).classList.remove("hidden");
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add("hidden");
+        }
+
+        // Toast Helper
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            document.getElementById("toastMsg").innerText = msg;
+            toast.classList.remove("translate-y-20", "opacity-0");
+            
+            setTimeout(() => {
+                toast.classList.add("translate-y-20", "opacity-0");
+            }, 3000);
+        }
+
+        // Sanitizer helper
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
